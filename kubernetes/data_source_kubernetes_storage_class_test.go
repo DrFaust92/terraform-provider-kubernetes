@@ -122,6 +122,7 @@ func TestAccKubernetesDataSourceStorageClass_gke(t *testing.T) {
 					resource.TestCheckResourceAttr("data.kubernetes_storage_class.test", "mount_options.0", "bar"),
 					resource.TestCheckResourceAttr("data.kubernetes_storage_class.test", "parameters.%", "1"),
 					resource.TestCheckResourceAttr("data.kubernetes_storage_class.test", "parameters.type", "pd-ssd"),
+					resource.TestCheckResourceAttr("data.kubernetes_storage_class.test", "allowed_topologies.%", "0"),
 				),
 			},
 		},

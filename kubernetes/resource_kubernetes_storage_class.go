@@ -46,6 +46,11 @@ func resourceKubernetesStorageClass() *schema.Resource {
 				Description: "Indicates the type of the reclaim policy",
 				Optional:    true,
 				Default:     "Delete",
+				ValidateFunc: validation.StringInSlice([]string{
+					"Recycle",
+					"Delete",
+					"Retain",
+				}, false),
 			},
 			"volume_binding_mode": {
 				Type:         schema.TypeString,
@@ -133,6 +138,10 @@ func resourceKubernetesStorageClassCreate(ctx context.Context, d *schema.Resourc
 		storageClass.AllowedTopologies = expandStorageClassAllowedTopologies(v.([]interface{}))
 	}
 
+	if v, ok := d.GetOk("allowed_topologies"); ok && len(v.([]interface{})) > 0 {
+		storageClass.AllowedTopologies = expandStorageClassAllowedTopologies(v.([]interface{}))
+	}
+
 	log.Printf("[INFO] Creating new storage class: %#v", storageClass)
 	out, err := conn.StorageV1().StorageClasses().Create(ctx, &storageClass, metav1.CreateOptions{})
 	if err != nil {
@@ -182,6 +191,11 @@ func resourceKubernetesStorageClassRead(ctx context.Context, d *schema.ResourceD
 			diags = append(diags, diag.FromErr(err)[0])
 		}
 	}
+
+	if storageClass.AllowedTopologies != nil {
+		d.Set("allowed_topologies", flattenStorageClassAllowedTopologies(storageClass.AllowedTopologies))
+	}
+
 	return diags
 }
 
@@ -258,4 +272,58 @@ func resourceKubernetesStorageClassExists(ctx context.Context, d *schema.Resourc
 		log.Printf("[DEBUG] Received error: %#v", err)
 	}
 	return true, err
+}
+
+func expandStorageClassAllowedTopologies(l []interface{}) []v1.TopologySelectorTerm {
+	if len(l) == 0 || l[0] == nil {
+		return []v1.TopologySelectorTerm{}
+	}
+
+	in := l[0].(map[string]interface{})
+	topologies := make([]v1.TopologySelectorTerm, 0)
+	obj := v1.TopologySelectorTerm{}
+
+	if v, ok := in["match_label_expressions"].([]interface{}); ok && len(v) > 0 {
+		obj.MatchLabelExpressions = expandStorageClassMatchLabelExpressions(v)
+	}
+
+	topologies = append(topologies, obj)
+
+	return topologies
+}
+
+func expandStorageClassMatchLabelExpressions(l []interface{}) []v1.TopologySelectorLabelRequirement {
+	if len(l) == 0 || l[0] == nil {
+		return []v1.TopologySelectorLabelRequirement{}
+	}
+	obj := make([]v1.TopologySelectorLabelRequirement, len(l), len(l))
+	for i, n := range l {
+		in := n.(map[string]interface{})
+		obj[i] = v1.TopologySelectorLabelRequirement{
+			Key:    in["key"].(string),
+			Values: sliceOfString(in["values"].(*schema.Set).List()),
+		}
+	}
+	return obj
+}
+
+func flattenStorageClassAllowedTopologies(in []v1.TopologySelectorTerm) []interface{} {
+	att := make(map[string]interface{})
+	for _, n := range in {
+		if len(n.MatchLabelExpressions) > 0 {
+			att["match_label_expressions"] = flattenStorageClassMatchLabelExpressions(n.MatchLabelExpressions)
+		}
+	}
+	return []interface{}{att}
+}
+
+func flattenStorageClassMatchLabelExpressions(in []v1.TopologySelectorLabelRequirement) []interface{} {
+	att := make([]interface{}, len(in), len(in))
+	for i, n := range in {
+		m := make(map[string]interface{})
+		m["key"] = n.Key
+		m["values"] = newStringSet(schema.HashString, n.Values)
+		att[i] = m
+	}
+	return att
 }

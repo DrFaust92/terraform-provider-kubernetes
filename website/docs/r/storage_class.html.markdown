@@ -39,7 +39,12 @@ The following arguments are supported:
 * `volume_binding_mode` - (Optional) Indicates when volume binding and dynamic provisioning should occur.
 * `allow_volume_expansion` - (Optional) Indicates whether the storage class allow volume expand, default true.
 * `mount_options` - (Optional) Persistent Volumes that are dynamically created by a storage class will have the mount options specified.
+<<<<<<< HEAD
 * `allowed_topologies` - (Optional) Restrict the node topologies where volumes can be dynamically provisioned. See [allowed_topologies](#allowed_topologies)
+=======
+* `allowed_topologies` - (Optional) Restrict the node topologies where volumes can be dynamically provisioned. see [allowed_topologies](#allowed_topologies)
+
+>>>>>>> 5c40925e (add support for `allowed_topologies` + some validations)
 
 ## Nested Blocks
 
@@ -59,6 +64,7 @@ The following arguments are supported:
 * `name` - (Optional) Name of the storage class, must be unique. Cannot be updated. For more info see [Kubernetes reference](http://kubernetes.io/docs/user-guide/identifiers#names)
 
 ### `allowed_topologies`
+<<<<<<< HEAD
 ￼
 #### Arguments
 ￼
@@ -69,6 +75,16 @@ The following arguments are supported:
 ￼
 #### Arguments
 ￼
+=======
+
+#### Arguments
+
+* `match_label_expressions` - (Optional) A list of topology selector requirements by labels. see [match_label_expressions](#match_label_expressions)
+
+### `match_label_expressions`
+
+#### Arguments
+>>>>>>> 5c40925e (add support for `allowed_topologies` + some validations)
 
 * `key` - (Optional) The label key that the selector applies to.
 * `values` - (Optional) An array of string values. One value must match the label to be selected.

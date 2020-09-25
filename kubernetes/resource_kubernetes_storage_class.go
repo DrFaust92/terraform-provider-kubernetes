@@ -47,7 +47,6 @@ func resourceKubernetesStorageClass() *schema.Resource {
 				Optional:    true,
 				Default:     "Delete",
 				ValidateFunc: validation.StringInSlice([]string{
-					"Recycle",
 					"Delete",
 					"Retain",
 				}, false),

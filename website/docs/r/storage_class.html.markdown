@@ -44,8 +44,11 @@ The following arguments are supported:
 =======
 * `allowed_topologies` - (Optional) Restrict the node topologies where volumes can be dynamically provisioned. see [allowed_topologies](#allowed_topologies)
 
+<<<<<<< HEAD
 >>>>>>> 5c40925e (add support for `allowed_topologies` + some validations)
 
+=======
+>>>>>>> 0eb1bdc8 (docs)
 ## Nested Blocks
 
 ### `metadata`
@@ -84,7 +87,6 @@ The following arguments are supported:
 ### `match_label_expressions`
 
 #### Arguments
->>>>>>> 5c40925e (add support for `allowed_topologies` + some validations)
 
 * `key` - (Optional) The label key that the selector applies to.
 * `values` - (Optional) An array of string values. One value must match the label to be selected.

@@ -58,6 +58,21 @@ func resourceKubernetesCSIDriver() *schema.Resource {
 								}, false),
 							},
 						},
+						"storage_capacity": {
+							Type:        schema.TypeBool,
+							Description: "Indicates that the CSI volume driver wants pod scheduling to consider the storage capacity.",
+							Optional:    true,
+						},
+						"fs_group_policy": {
+							Type:        schema.TypeString,
+							Description: "Defines if the underlying volume supports changing ownership and permission of the volume before being mounted.",
+							Optional:    true,
+							ValidateFunc: validation.StringInSlice([]string{
+								"ReadWriteOnceWithFSType",
+								"File",
+								"None",
+							}, false),
+						},
 					},
 				},
 			},

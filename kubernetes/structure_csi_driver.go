@@ -24,6 +24,15 @@ func expandCSIDriverSpec(l []interface{}) storage.CSIDriverSpec {
 		obj.VolumeLifecycleModes = expandCSIDriverVolumeLifecycleModes(v)
 	}
 
+	if v, ok := in["storage_capacity"].(bool); ok {
+		obj.StorageCapacity = ptrToBool(v)
+	}
+
+	if v, ok := in["fs_group_policy"].(string); ok {
+		policy := storage.FSGroupPolicy(v)
+		obj.FSGroupPolicy = &policy
+	}
+
 	return obj
 }
 
@@ -40,12 +49,20 @@ func flattenCSIDriverSpec(in storage.CSIDriverSpec) ([]interface{}, error) {
 
 	att["attach_required"] = in.AttachRequired
 
+	if in.StorageCapacity != nil {
+		att["storage_capacity"] = in.StorageCapacity
+	}
+
 	if in.PodInfoOnMount != nil {
 		att["pod_info_on_mount"] = in.PodInfoOnMount
 	}
 
 	if len(in.VolumeLifecycleModes) > 0 {
 		att["volume_lifecycle_modes"] = in.VolumeLifecycleModes
+	}
+
+	if in.FSGroupPolicy != nil {
+		att["fs_group_policy"] = in.FSGroupPolicy
 	}
 
 	return []interface{}{att}, nil
